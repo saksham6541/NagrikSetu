@@ -1,0 +1,6 @@
+{
+  "name": "NagrikSetu",
+  "description": "A hyperlocal community issue resolution platform empowering citizens to report, track, and resolve infrastructure issues with AI-assisted categorization, priority scoring, and duplicate detection.",
+  "requestFramePermissions": ["geolocation", "camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

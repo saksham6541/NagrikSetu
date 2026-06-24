@@ -20,7 +20,7 @@ https://nagriksetu-812408830274.asia-southeast1.run.app
 Add your GitHub repository link here:
 
 ```text
-https://github.com/your-username/nagriksetu
+https://github.com/saksham6541/NagrikSetu
 ```
 
 ---
@@ -247,12 +247,6 @@ Citizens can submit civic complaints using AI-assisted categorization, multiling
 GPS-backed reporting and verification improve accountability and ensure location-authenticated issue management.
 
 ---
-
-## Workforce Assignment Workflow
-
-![Assignment Workflow](screenshots/assignment-workflow.png)
-
-Municipal officers assign skilled workers based on issue category and expertise, ensuring efficient issue resolution.
 
 ---
 

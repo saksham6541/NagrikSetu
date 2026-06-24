@@ -17,7 +17,7 @@ https://nagriksetu-812408830274.asia-southeast1.run.app
 
 ## GitHub Repository
 
-Add your GitHub repository link here:
+Repository Link:
 
 ```text
 https://github.com/saksham6541/NagrikSetu

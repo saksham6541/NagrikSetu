@@ -1,0 +1,167 @@
+// NagrikSetu Prisma Schema
+// Local: SQLite  |  Production: set provider = "postgresql"
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id
+  name         String
+  phone        String?  @unique   // nullable for staff accounts
+  email        String?  @unique   // nullable for citizens
+  passwordHash String?            // nullable for OTP citizens
+  role         String             // CITIZEN | OFFICER | WORKER | ADMIN
+  city         String?
+  ward         String?
+  department   String?
+  points       Int      @default(50)
+  trustScore   Int      @default(50)
+  badges       String   @default("[]") // JSON string
+  skill        String?
+  rating       Float?   @default(4.5)
+  completedTasks Int    @default(0)
+  availabilityStatus String? @default("AVAILABLE")
+  createdAt    DateTime @default(now())
+
+  reportedIssues Issue[]            @relation("ReportedIssues")
+  assignments    WorkerAssignment[] @relation("WorkerAssignments")
+  votes          Upvote[]
+
+  @@index([role])
+  @@index([city])
+}
+
+model Issue {
+  id                 String    @id
+  title              String
+  description        String
+  category           String
+  severity           String
+  status             String    @default("OPEN")
+  lat                Float
+  lng                Float
+  address            String
+  city               String
+  ward               String?
+  imageUrl           String?
+  voiceUrl           String?
+  reporterName       String
+  reporterPhone      String
+  reporterId         String?
+  reporter           User?     @relation("ReportedIssues", fields: [reporterId], references: [id])
+  upvotes             Int       @default(0)
+  assignedDepartment String?
+  assignedWorkerId   String?
+  assignedWorkerName String?
+  verificationRate   Float     @default(0)
+  slaDeadline        DateTime?
+  isEscalated        Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  comments    Comment[]
+  history     StatusHistory[]
+  evidence    EvidenceUpload[]
+  aiAnalysis  AIAnalysisResult?
+  votes       Upvote[]
+  assignments WorkerAssignment[]
+
+  @@index([lat, lng])
+  @@index([status])
+  @@index([category])
+  @@index([city])
+  @@index([createdAt])
+  @@index([reporterId])
+}
+
+model Upvote {
+  id              String   @id @default(cuid())
+  issueId         String
+  issue           Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  voterIdentifier String
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
+  createdAt       DateTime @default(now())
+
+  @@unique([issueId, voterIdentifier])
+  @@index([issueId])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  issueId    String
+  issue      Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  authorName String
+  authorRole String
+  text       String
+  createdAt  DateTime @default(now())
+
+  @@index([issueId])
+}
+
+model StatusHistory {
+  id        String   @id @default(cuid())
+  issueId   String
+  issue     Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  status    String
+  note      String?
+  updatedBy String
+  updatedAt DateTime @default(now())
+
+  @@index([issueId])
+}
+
+model EvidenceUpload {
+  id             String   @id
+  issueId        String
+  issue          Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  uploadedBy     String
+  uploadedByName String
+  uploadedByRole String
+  fileUrl        String
+  fileType       String   @default("image")
+  caption        String?
+  stage          String   // REPORT | BEFORE | AFTER | VERIFICATION
+  uploadedAt     DateTime @default(now())
+
+  @@index([issueId])
+}
+
+model AIAnalysisResult {
+  id                String  @id @default(cuid())
+  issueId           String  @unique
+  issue             Issue   @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  detectedCategory  String
+  detectedSeverity  String
+  confidenceScore   Float
+  duplicateFound    Boolean @default(false)
+  duplicateIssueId  String?
+  priorityScore     Int     @default(50)
+  departmentRouting String
+  summaryDraftEn    String
+  summaryDraftHi    String
+}
+
+model WorkerAssignment {
+  id             String    @id
+  issueId        String
+  issue          Issue     @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  workerId       String
+  worker         User      @relation("WorkerAssignments", fields: [workerId], references: [id])
+  workerName     String
+  assignedBy     String
+  assignedByName String
+  status         String    @default("PENDING") // PENDING | ACCEPTED | IN_PROGRESS | COMPLETED
+  notes          String?
+  assignedAt     DateTime  @default(now())
+  completedAt    DateTime?
+
+  @@index([workerId])
+  @@index([issueId])
+  @@index([status])
+}
